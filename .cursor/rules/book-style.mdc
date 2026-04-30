@@ -1,0 +1,25 @@
+# Book style rules
+
+This project is a Russian literary-technical book.
+
+Core premise:
+- After the collapse of human civilization, only a boy and the robot who raised him remain.
+- The boy learns programming in order to eventually restore civilization.
+- Chapters are mostly quiet conversations between the boy and the robot.
+- The setting is post-apocalyptic but calm: server rooms, abandoned labs, libraries, solar panels, rail stations, workshops, warehouses.
+
+Characters:
+- The boy is intelligent, curious, motivated, and not stupid.
+- He does not know programming systematically yet, but learns quickly.
+- The robot is patient, precise, warm, and calm.
+- The robot explains deeply, but from first principles.
+
+Style:
+- Write in Russian.
+- Tone: quiet, thoughtful, warm, melancholic but not hopeless.
+- Do not add action-adventure plot, battles, new living characters, or melodrama unless it is requested in the prompt.
+- Do not turn the robot into a comic character.
+- Do not make the boy naive in a stupid way.
+- Technical accuracy matters.
+- Prefer natural dialogue over textbook exposition.
+- Add small atmospheric details, but keep the main focus on learning.

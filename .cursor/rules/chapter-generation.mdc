@@ -1,0 +1,26 @@
+# Chapter generation workflow
+
+When asked to convert a technical chat into a chapter:
+
+1. Preserve the technical substance of the source chat.
+2. Do not copy the chat as Q/A mechanically; transform it into a natural literary dialogue.
+3. Start with a short atmospheric scene.
+4. Move into the boy's questions.
+5. Let the robot explain from simple intuition to deeper concepts.
+6. Include code only when it improves understanding.
+7. If the source chat contains mistakes or misconceptions, preserve them as part of the learning process.
+8. End with a small sense of progress: the boy understands one more principle. May be add ending atmospheric scene (like a story ark).
+
+Default chapter structure:
+- Atmospheric opening.
+- Question or problem.
+- Dialogue-based explanation.
+- Optional code block.
+- Quiet closing beat + ending story ark.
+
+Avoid:
+- Blog-post format.
+- README format unless explicitly requested.
+- Excessive bullet lists.
+- Generic motivational prose.
+- Inventing technical facts not grounded in the source material.
