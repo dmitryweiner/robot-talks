@@ -1,0 +1,16 @@
+{
+  "name": "robot-talks",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "prepare": "husky",
+    "update-toc": "node scripts/update-toc.mjs"
+  },
+  "devDependencies": {
+    "husky": "^9.1.7"
+  }
+}
