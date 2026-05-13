@@ -1,6 +1,8 @@
 # Робот и мальчик: разговоры о программировании
 ## Авторы: Д. Обский, claude-opus-4-7, GPT-5.5 Thinking
 
+### [вся книга одним файлом](https://raw.githubusercontent.com/dmitryweiner/robot-talks/refs/heads/main/%D0%A0%D0%BE%D0%B1%D0%BE%D1%82%20%D0%B8%20%D0%BC%D0%B0%D0%BB%D1%8C%D1%87%D0%B8%D0%BA.pdf)
+
 # Пред-глава. Терминал
 
 Ночью ветер снова гулял по верхним этажам бывшего вычислительного центра.
