@@ -5,6 +5,45 @@ import { fileURLToPath } from "node:url";
 import { execFileSync } from "node:child_process";
 import showdown from "showdown";
 
+// Showdown's stock `unhashHTMLSpans` aborts placeholder resolution after just
+// 10 levels of nested spans, printing "maximum nesting of 10 spans reached!!!"
+// and leaving raw `¨CNNC` markers in the output. Dense inline code (e.g. a
+// paragraph with 30+ backticked words) easily exceeds that limit. Reinstall
+// the sub-parser with a much higher safety bound so deep but finite nesting
+// resolves cleanly.
+showdown.subParser("unhashHTMLSpans", function (text, options, globals) {
+  text = globals.converter._dispatch(
+    "unhashHTMLSpans.before",
+    text,
+    options,
+    globals,
+  );
+  const HARD_LIMIT = 10000;
+  for (let i = 0; i < globals.gHtmlSpans.length; ++i) {
+    let repText = globals.gHtmlSpans[i];
+    let depth = 0;
+    while (/¨C(\d+)C/.test(repText)) {
+      if (depth >= HARD_LIMIT) {
+        console.error(
+          `[build-html] showdown span unhash exceeded hard limit ${HARD_LIMIT}`,
+        );
+        break;
+      }
+      const num = RegExp.$1;
+      repText = repText.replace("¨C" + num + "C", globals.gHtmlSpans[num]);
+      depth++;
+    }
+    text = text.replace("¨C" + i + "C", repText);
+  }
+  text = globals.converter._dispatch(
+    "unhashHTMLSpans.after",
+    text,
+    options,
+    globals,
+  );
+  return text;
+});
+
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, "..");
 
@@ -97,6 +136,48 @@ function makeConverter() {
     emoji: false,
     smartIndentationFix: true,
   });
+}
+
+// Showdown 2.x doesn't list <details>/<summary> in its block-level HTML tags,
+// so it wraps them in <p>, hashes their inline content into spans and trips the
+// "maximum nesting of 10 spans reached" warning. We pre-render every
+// <details>...</details> block with its own sub-converter and replace it with
+// a placeholder that the main pass will pass through untouched.
+const DETAILS_RE = /<details\b([^>]*)>([\s\S]*?)<\/details>/gi;
+const SUMMARY_RE = /^\s*<summary\b([^>]*)>([\s\S]*?)<\/summary>\s*/i;
+// SOH-delimited token of only letters/digits — avoids any markdown-active
+// characters (e.g. underscores, which showdown would turn into <em>).
+const PLACEHOLDER_PREFIX = "\u0001DETAILSBLOCK";
+const PLACEHOLDER_SUFFIX = "\u0001";
+
+function stripParagraphWrap(html) {
+  const trimmed = html.trim();
+  const m = trimmed.match(/^<p>([\s\S]*)<\/p>$/);
+  return m && !/<\/p>\s*<p>/.test(m[1]) ? m[1] : trimmed;
+}
+
+function renderMarkdown(md, converter) {
+  const blocks = [];
+  const preprocessed = md.replace(DETAILS_RE, (_match, attrs, body) => {
+    let summary = "";
+    const rest = body.replace(SUMMARY_RE, (_m, sattrs, scontent) => {
+      const inner = stripParagraphWrap(converter.makeHtml(scontent.trim()));
+      summary = `<summary${sattrs}>${inner}</summary>\n`;
+      return "";
+    });
+    const bodyHtml = converter.makeHtml(rest.trim());
+    const blockHtml = `<details${attrs}>\n${summary}${bodyHtml}\n</details>`;
+    const id = blocks.push(blockHtml) - 1;
+    return `\n\n${PLACEHOLDER_PREFIX}${id}${PLACEHOLDER_SUFFIX}\n\n`;
+  });
+
+  let html = converter.makeHtml(preprocessed);
+
+  const placeholderRe = new RegExp(
+    `(?:<p>\\s*)?${PLACEHOLDER_PREFIX}(\\d+)${PLACEHOLDER_SUFFIX}(?:\\s*</p>)?`,
+    "g",
+  );
+  return html.replace(placeholderRe, (_m, id) => blocks[Number(id)]);
 }
 
 const CSS = `
@@ -201,14 +282,14 @@ function main() {
   const converter = makeConverter();
 
   const readmeHtml = existsSync(join(ROOT, README))
-    ? converter.makeHtml(readReadme())
+    ? renderMarkdown(readReadme(), converter)
     : "";
 
   const tocHtml = buildTocHtml(chapters);
 
   const chaptersHtml = chapters
     .map((ch) => {
-      const body = converter.makeHtml(readChapter(ch.filename));
+      const body = renderMarkdown(readChapter(ch.filename), converter);
       return `<section class="chapter" id="${ch.anchor}">
 ${body}
 <a class="back-to-toc" href="#toc">↑ К оглавлению</a>
