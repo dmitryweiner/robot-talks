@@ -14,4 +14,4 @@ elif [ -s "/opt/homebrew/opt/nvm/nvm.sh" ]; then
 fi
 
 node scripts/update-toc.mjs
-node scripts/build-pdf.mjs
+node scripts/build-html.mjs

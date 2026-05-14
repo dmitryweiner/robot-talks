@@ -9,10 +9,10 @@
   "scripts": {
     "prepare": "husky",
     "update-toc": "node scripts/update-toc.mjs",
-    "build-pdf": "node scripts/build-pdf.mjs"
+    "build-html": "node scripts/build-html.mjs"
   },
   "devDependencies": {
     "husky": "^9.1.7",
-    "md-to-pdf": "^5.2.5"
+    "showdown": "^2.1.0"
   }
 }
