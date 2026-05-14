@@ -58,6 +58,10 @@ const NAV_NEXT_START = "<!-- nav:next:start -->";
 const NAV_NEXT_END = "<!-- nav:next:end -->";
 const TOC_START = "<!-- toc:start -->";
 const TOC_END = "<!-- toc:end -->";
+// Content wrapped in these markers lives only in README.md (e.g. a link to the
+// online version of the book) and is stripped from the generated index.html.
+const README_ONLY_START = "<!-- readme-only:start -->";
+const README_ONLY_END = "<!-- readme-only:end -->";
 
 function escapeRe(s) {
   return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -106,7 +110,9 @@ function readChapter(filename) {
 
 function readReadme() {
   const text = readFileSync(join(ROOT, README), "utf8");
-  return stripBlock(text, TOC_START, TOC_END).trim();
+  let body = stripBlock(text, TOC_START, TOC_END);
+  body = stripBlock(body, README_ONLY_START, README_ONLY_END);
+  return body.trim();
 }
 
 function buildTocHtml(chapters) {
