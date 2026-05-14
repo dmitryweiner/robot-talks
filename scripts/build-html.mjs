@@ -79,9 +79,9 @@ function buildTocHtml(chapters) {
     .join("\n");
   return `<nav class="toc" id="toc">
   <h2>Оглавление</h2>
-  <ol>
+  <ul>
 ${items}
-  </ol>
+  </ul>
 </nav>`;
 }
 
