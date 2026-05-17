@@ -278,6 +278,11 @@ const CSS = `
   }
 `;
 
+const READER_JS = readFileSync(
+  join(__dirname, "reader-position.js"),
+  "utf8",
+);
+
 function main() {
   const chapters = findChapters();
   if (chapters.length === 0 && !existsSync(join(ROOT, README))) {
@@ -319,6 +324,7 @@ ${tocHtml}
 
 ${chaptersHtml}
 </main>
+<script>${READER_JS}</script>
 </body>
 </html>
 `;
